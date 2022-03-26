@@ -112,10 +112,10 @@ class mainScene {
         //timer = null;
         //startTimer();
     }
-
+    //反转二维数组方法
     revertArray(arr){
         var len=arr.length
-        var newArr=[[],[],[],[],[],[],[],[]]
+        var newArr=[[],[],[],[]]
 
         for (let i = 0; i < len; i++) {
             for (let j = 0; j < len; j++) {
