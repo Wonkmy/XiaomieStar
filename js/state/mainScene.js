@@ -114,6 +114,7 @@ class mainScene {
         //timer = null;
         //startTimer();
     }
+<<<<<<< HEAD
 
     revertArray(arr1) {
         var newArray = arr1[0].map(function (col, i) {
@@ -122,6 +123,19 @@ class mainScene {
             })
         });
         return newArray;
+=======
+    //反转二维数组方法
+    revertArray(arr){
+        var len=arr.length
+        var newArr=[[],[],[],[]]
+
+        for (let i = 0; i < len; i++) {
+            for (let j = 0; j < len; j++) {
+                newArr[j][len-1-i]=arr[i][j]
+            }
+        }
+        return newArr
+>>>>>>> 772ed951854fb5283b3bc435ac0f67a315356e8e
     }
     
     initStar(x, y) {
