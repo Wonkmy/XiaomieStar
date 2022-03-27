@@ -99,13 +99,15 @@ class mainScene {
         return Math.floor(Math.random() * (upper - lower)) + lower;
     }
     gameInit() {
-        for (var y = 0; y < this.hn; ++y) {
-            for (var x = 0; x < this.wn; ++x) {
+        this.goalScore = 1000;
+        for (var x = 0; x < this.hn; ++x) {
+             for (var y = 0; y < this.wn; ++y) {
                 this.starType[x][y] = parseInt(Math.random() * 999999999) % 7;
                 this.initStar(x,y);
             }
         }
-        this.starType=this.revertArray(this.starType);
+
+        //this.starType=this.revertArray(this.starType);
 
         console.log(this.starType);
         this.canOpera = true;
@@ -113,16 +115,13 @@ class mainScene {
         //startTimer();
     }
 
-    revertArray(arr){
-        var len=arr.length
-        var newArr=[[],[],[],[],[],[],[],[]]
-
-        for (let i = 0; i < len; i++) {
-            for (let j = 0; j < len; j++) {
-                newArr[j][len-1-i]=arr[i][j]
-            }
-        }
-        return newArr
+    revertArray(arr1) {
+        var newArray = arr1[0].map(function (col, i) {
+            return arr1.map(function (row) {
+                return row[i];
+            })
+        });
+        return newArray;
     }
     
     initStar(x, y) {
@@ -135,15 +134,15 @@ class mainScene {
             this.boxCell.events.onInputDown.add(function (sprite, pointer) {
                 that.selectDown(sprite);
             })
-            this.boxCell.data.id_x=y;
-            this.boxCell.data.id_y=x;
+            this.boxCell.data.id_x=x;
+            this.boxCell.data.id_y=y;
             this.boxCell.data.type=this.starType[x][y];
             this.allStar[x][y]=this.boxCell;
         }
     }
     //刷新星星矩阵
     refreshStar(x,y){
-        this.allStar[x][y].destroy()
+        this.allStar[x][y].destroy();
         this.initStar(x,y);
     }
     //玩家点击一个星星
@@ -154,24 +153,53 @@ class mainScene {
 
         let new_x = star_spr.data.id_x
         let new_y = star_spr.data.id_y
-        console.log(new_x+" : "+new_y);
+        // console.log(new_x+" : "+new_y);
         if (this.starType[new_x][new_y] !== this.box_none) {
             this.selectWipe(new_x, new_y);  // 搜索与之相连的星星
             this.destroyStar();
+            let that= this;
+            setTimeout(function () {
+                this.canOpera = false;
+                //wipeStar();
+                this.canOpera = true;
 
-            // setTimeout(function () {
-            //     canOpera = false;
-            //     wipeStar();
-            //     canOpera = true;
-
-            //     if (IsConnect()) {
-            //         startTimer();
-            //     } else {
-            //         gameOver();
-            //     }
-            // }, 150);
+                if (that.IsConnect()) {
+                    //startTimer();
+                } else {
+                    that.gameOver();
+                }
+            }, 150);
         }
         return true;
+    }
+
+    gameOver() {
+        if (this.score < this.goalScore) {
+            this.canOpera = false;
+            this.overBg = game.add.sprite(20, 10, 'bg2');
+            this.overBg.width = 372* unit;
+            this.overBg.height = 120* unit;
+            this.overBg.inputEnabled = true;
+        } else {
+            // nextLevel();
+        }
+    }
+
+    IsConnect() {
+        for (var x = 0; x < this.hn; ++x) {
+            for (var y = 0; y < this.wn; ++y) {
+                if (this.starType[x][y] !== -1) {
+                    for (var i = 0; i < 2; ++i) {
+                        var nx = x + this.dx[i], ny = y + this.dy[i];
+                        if (nx >= 0 && nx < this.hn && ny >= 0 && ny < this.wn
+                            && !this.visited[nx][ny] && this.starType[x][y] === this.starType[nx][ny]) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     //删除星星
@@ -191,7 +219,7 @@ class mainScene {
 
             this.addScore(len);
             this.moveStar();
-            
+            //this.starType=this.revertArray(this.starType);
         }
         else {
             for (var i = 0; i < len; ++i) {
@@ -217,11 +245,11 @@ class mainScene {
 
     //向下移动所有星星
     moveDown(y) {
-        var x1 = this.hn - 1;
+        var x1 = this.hn - 1;//7
         for (var x2 = x1; x2 >= 0; --x2) {
             if (this.starType[x2][y] !== this.box_none) {
                 this.starType[x1][y] = this.starType[x2][y];
-                --x1;
+                --x1;//6
             }
         }
         for (; x1 >= 0; --x1) {
@@ -244,7 +272,7 @@ class mainScene {
         }
         for (; y1 < this.wn; ++y1) {
             for (var x = 0; x < this.wn; ++x) {
-                this.starType[x][y1] = this.ST_NONE;
+                this.starType[x][y1] = this.box_none;
             }
         }
     }
@@ -266,12 +294,14 @@ class mainScene {
         //左移
         this.moveLeft(leftY);
 
+        
         for (var x = 0; x < this.hn; ++x) {
             for (var y = 0; y < this.wn; ++y) {
                 //移动完之后重新刷新矩阵
                 this.refreshStar(x,y);
             }
         }
+        
     }
     addScore(len) {
         

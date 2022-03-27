@@ -40,6 +40,8 @@ class preload {
         game.load.image('y2','./assets/images/y2.png')
         game.load.image('y1','./assets/images/y1.png')
 
+        game.load.image('bg2','./assets/images/bg2.png')
+
         game.load.image('girl', './assets/images/home_npc.png');
         game.load.image('title', './assets/images/logo.png');
         game.load.image('startBtn', './assets/images/play_button.png');
